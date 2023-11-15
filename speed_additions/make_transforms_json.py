@@ -4,7 +4,7 @@ from transforms import *
 import sys
 
 
-def make_file(dataset_location: str):
+def make_file(dataset_location: str, type='train'):
     thresh_dist = 5.0 # Interspacecraft distance max
     select_proba = 1.0 # Probability of selecting a valid frame from SPEED to 
 
@@ -26,7 +26,7 @@ def make_file(dataset_location: str):
     data["aabb_scale"] = 0.5
     data["n_extra_learnable_dims"] = 16
 
-    with open(dataset_location+'/train.json','r') as f:
+    with open(dataset_location+'/'+type+'.json','r') as f:
         metadata = json.load(f)
 
     last_line = np.zeros((1,4))
@@ -34,12 +34,19 @@ def make_file(dataset_location: str):
 
     frames = []
     for index in range(len(metadata)):
-        img_filename = metadata[index]['filename']
+        img_data = metadata[index]
+        img_filename = img_data['filename']
         if index==0:
             print(img_filename)
         img_filename = "images/" + img_filename
-        q = np.array(metadata[index]["q_vbs2tango"],  dtype=np.float32)
-        t = np.array(metadata[index]["r_Vo2To_vbs_true"], dtype=np.float32).reshape(3,1)
+        
+        if "q_vbs2tango" in img_data.keys():
+            q = np.array(img_data["q_vbs2tango"],  dtype=np.float32)
+        elif "q_vbs2tango_true" in img_data.keys():
+            q = np.array(img_data["q_vbs2tango_true"],  dtype=np.float32)
+        else:
+            raise KeyError("q_vbs2tango key is not present?")      
+        t = np.array(img_data["r_Vo2To_vbs_true"], dtype=np.float32).reshape(3,1)
         
         Rinv = quaternion2rotation(q).T
         T = -Rinv@t
@@ -55,14 +62,17 @@ def make_file(dataset_location: str):
             frames.append(frame)
             
     data["frames"] = frames
-    with open(dataset_location+'transforms.json', 'w') as f:
+    with open(dataset_location+'/transforms.json', 'w') as f:
         json.dump(data, f, indent=2)
 
     return
 
 if __name__=='__main__':
-    if len(sys.argv)>1:
-        print(f'Storing transforms file at {sys.argv[1]}')
+    if len(sys.argv)==2:
+        print(f'Storing transforms file for train at {sys.argv[1]}')
         make_file(sys.argv[1])
+    elif len(sys.argv)>2:
+        print(f'Storing transforms file for {sys.argv[2]} at {sys.argv[1]}')
+        make_file(sys.argv[1], type=sys.argv[2])
     else:
         print('Add path of dataset!')
