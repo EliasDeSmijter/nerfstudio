@@ -55,6 +55,8 @@ def generate_random_camera_path(nb_positions: int=100, filename: str='camera_pat
     with open(filename, 'w', encoding='utf-8') as f: # Camera Path for NeRFStudio
         json.dump(data, f, indent=2)
 
+    print('\U0001F389 \U0001F389 DONE \U0001F389 \U0001F389')
+
 
 def entrypoint():
     """Entrypoint for use with pyproject scripts."""
