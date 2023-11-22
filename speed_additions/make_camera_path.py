@@ -1,17 +1,15 @@
+import tyro
 import numpy as np
 import json
-import pandas as pd
+from .transforms import random_quaternion,quaternion2rotation
 
-from transforms import *
-
-import os 
-from PIL import Image
-from matplotlib import pyplot as plt
-
-Nfiles = 1
-N = 100
-
-for n in range(Nfiles):
+def generate_random_camera_path(nb_positions: int=100, filename: str='camera_path.json') -> None:
+    """Function to generate a random camera path to be used when rendering
+    
+    Args:
+        nb_positions: Number of positions in the camera path
+        filename: path + name of file to be saved. Default: save in current working directory
+    """
     data = {}
     data["camera_type"] = "perspective"
     data["render_height"] = 1200
@@ -26,12 +24,8 @@ for n in range(Nfiles):
     dist_min /= 3.0 # account for NeRFStudio scaling
     dist_max /= 3.0 # account for NeRFStudio scaling
 
-    gt = {}
-
-    temp_gt = []
-
     camera_path = []
-    for index in range(N):
+    for _ in range(nb_positions):
         q = random_quaternion()
         d = np.random.random() * (dist_max - dist_min) + dist_min
         dx = ((np.random.random()*2.0)-1.0) * d * 0.15
@@ -50,24 +44,24 @@ for n in range(Nfiles):
         frame["fov"] = 22.595
         frame["aspect"] = 1.6
         camera_path.append(frame)
-        
-        gt_frame = {}
-        gt_frame["index"] = index
-        gt_frame["q_gt"] = (q).tolist()
-        gt_frame["t_gt"] = (t * 3.0).tolist()
-        temp_gt.append(gt_frame)
 
     data["camera_path"] = camera_path
-
     data["fps"] = 1
-    data["seconds"] = N
+    data["seconds"] = nb_positions
     data["smoothness_value"] = 0.0
     data["is_cycle"] = False
     data["crop"] = None
 
-    with open('camera_path_' + str(n) + '.json', 'w') as f: # Camera Path for NeRFStudio
+    with open(filename, 'w', encoding='utf-8') as f: # Camera Path for NeRFStudio
         json.dump(data, f, indent=2)
-        
-    gt["frames"] = temp_gt
-    with open('gt_camera_path_' + str(n)  + '.json', 'w') as f: # GT in SPEED-style format
-        json.dump(gt, f, indent=2)
+
+
+def entrypoint():
+    """Entrypoint for use with pyproject scripts."""
+    # Choose a base configuration and override values.
+    tyro.extras.set_accent_color("bright_yellow")
+    tyro.cli(generate_random_camera_path)
+    return
+
+if __name__ == "__main__":
+    entrypoint()

@@ -122,6 +122,8 @@ ns-render = "nerfstudio.scripts.render:entrypoint"
 ns-export = "nerfstudio.scripts.exporter:entrypoint"
 ns-dev-test = "nerfstudio.scripts.github.run_actions:entrypoint"
 ns-dev-sync-viser-message-defs = "nerfstudio.scripts.viewer.sync_viser_message_defs:entrypoint"
+ns-speed-transforms = "speed_additions.make_transforms_json:entrypoint"
+ns-speed-random-camera-path = "speed_additions.make_camera_path:entrypoint"
 
 [options]
 # equivalent to using --extra-index-url with pip, which is needed for specifying the CUDA version torch and torchvision
@@ -130,7 +132,7 @@ dependency_links = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["nerfstudio*"]
+include = ["nerfstudio*", "speed_additions*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.cu", "*.json", "py.typed", "setup.bash", "setup.zsh"]
@@ -145,7 +147,7 @@ testpaths = [
 ]
 
 [tool.pyright]
-include = ["nerfstudio"]
+include = ["nerfstudio", "speed_additions"]
 exclude = ["**/node_modules",
     "**/__pycache__",
 ]
