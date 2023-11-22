@@ -2,7 +2,7 @@ import json
 import os
 import random
 import tyro
-from typing import List, Literal, Tuple
+from typing import Literal, Tuple
 import numpy as np
 from .transforms import quaternion2rotation
 
@@ -19,7 +19,7 @@ def create_transf_matrix(q, t):
 
     return M.tolist()
 
-def make_transforms_json(store_location: str, dataset_locations: List[str], method: Literal['train','val','test']='train', split: Tuple[float, float, float]=(1,0,0), load_split_file: bool=False, split_file_loc: str=None) -> None:
+def make_transforms_json(store_location: str, dataset_locations: Tuple[str, ...], method: Literal['train','val','test']='train', split: Tuple[float, float, float]=(1,0,0), load_split_file: bool=False, split_file_loc: str=None) -> None:
     """Generate transforms.json file for a given dataset.
     Some parts are hardcoded for speedplusv2!
 

@@ -8,7 +8,7 @@ def generate_random_camera_path(nb_positions: int=100, filename: str='camera_pat
     
     Args:
         nb_positions: Number of positions in the camera path
-        filename: path + name of file to be saved. Default: save in current working directory
+        filename: path + name of file (should end in json!) to be saved. Default: save in current working directory
     """
     data = {}
     data["camera_type"] = "perspective"
